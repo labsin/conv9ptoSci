@@ -22,7 +22,7 @@ type Sci struct {
 }
 
 func (self Sci) String() string {
-	return "border.left: " + strconv.Itoa(self.Left) + "\nborder.right: " + strconv.Itoa(self.Right) + "\nborder.bottom: " + strconv.Itoa(self.Bottom) + "\nborder.right: " + strconv.Itoa(self.Right) + "\nsource: " + self.Source
+	return "border.left: " + strconv.Itoa(self.Left) + "\nborder.right: " + strconv.Itoa(self.Right) + "\nborder.bottom: " + strconv.Itoa(self.Bottom) + "\nborder.top: " + strconv.Itoa(self.Top) + "\nsource: " + self.Source
 }
 
 func main() {
