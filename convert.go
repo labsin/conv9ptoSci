@@ -28,10 +28,15 @@ func (self Sci) String() string {
 func main() {
 	var imgFlag string
 	var verbose bool
+	var veryVerbose bool
 	flag.StringVar(&imgFlag, "img", "", "The 9patch image")
 	flag.BoolVar(&verbose, "v", false, "Verbose output")
+	flag.BoolVar(&veryVerbose, "vv", false, "Very verbose output")
 	flag.Parse()
 
+	if veryVerbose {
+		verbose = true
+	}
 	imgDir := filepath.Dir(imgFlag)
 	imgBase := filepath.Base(imgFlag)
 
@@ -60,11 +65,11 @@ func main() {
 	sci := Sci{-1, -1, -1, -1, imgNoExtBase + ".png"}
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		r, g, b, a := img.At(0, y).RGBA()
-		if verbose {
+		if veryVerbose {
 			fmt.Printf("At y %d -> %d,%d,%d,%d\n", y, r, g, b, a)
 		}
 		if !(a == 0 || a == 65535) || !(r == 0 && g == 0 && b == 0) { // When not black or transparant it's not a valid 9patch
-			log.Fatal("Not a valid 9patch file. Wrong pixel at (x,y): (0," + strconv.Itoa(y) + ")")
+			log.Fatal("File "+imgBase+" is not a valid 9patch file. Wrong pixel at (x,y): (0," + strconv.Itoa(y) + ")")
 		}
 		if sci.Top == -1 && a == 65535 { // Wait for black pixel
 			sci.Top = y - 1
@@ -76,11 +81,11 @@ func main() {
 	}
 	for x := bounds.Min.X; x < bounds.Max.X; x++ {
 		r, g, b, a := img.At(x, 0).RGBA()
-		if verbose {
+		if veryVerbose {
 			fmt.Printf("At x %d -> %d,%d,%d,%d\n", x, r, g, b, a)
 		}
 		if !(a == 0 || a == 65535) || !(r == 0 && g == 0 && b == 0) { // When not black or transparant it's not a valid 9patch
-			log.Fatal("Not a valid 9patch file. Wrong pixel at (x,y): (" + strconv.Itoa(x) + ",0)")
+			log.Fatal("File "+imgBase+" is no a valid 9patch file. Wrong pixel at (x,y): (" + strconv.Itoa(x) + ",0)")
 		}
 		if sci.Left == -1 && a == 65535 { // Wait for black pixel
 			sci.Left = x - 1
@@ -90,7 +95,7 @@ func main() {
 			break
 		}
 	}
-	if verbose {
+	if veryVerbose {
 		fmt.Print(sci, "\n")
 	}
 
@@ -108,7 +113,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Print("Wrote " + sci.Source + " to " + imgDir + "\n")
+	if verbose {
+		fmt.Print("Wrote " + sci.Source + " to " + imgDir + "\n")
+	}
 	writer.Close()
 
 	sciBaseName := imgNoExtBase + ".sci"
@@ -123,5 +130,7 @@ func main() {
 	if err := sciWriter.Close(); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Print("Wrote " + sciBaseName + " to " + imgDir + "\n")
+	if verbose {
+		fmt.Print("Wrote " + sciBaseName + " to " + imgDir + "\n")
+	}
 }
